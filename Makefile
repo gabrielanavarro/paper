@@ -18,12 +18,11 @@ all:
 
 $(TARGET): $(MAIN_FILE)
 	$(LATEX) $(MAIN_FILE)
-	$(BIBTEX) $(MAIN_FILE)
-	$(LATEX) $(MAIN_FILE)
-	$(LATEX) $(MAIN_FILE)
 	$(DVIPS) $(DVI_FILE)
 	$(PS2PDF) $(PS_FILE)
 	@cp $(PDF_FILE) $(TARGET)
+
+
 
 clean:
 	rm -f *~ *.dvi *.ps *.backup *.aux *.log

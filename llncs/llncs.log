@@ -1,0 +1,73 @@
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdftex 2014.6.21)  28 AUG 2014 15:10
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**llncs.tex
+(./llncs.tex
+! Undefined control sequence.
+l.6 \documentclass
+                  {llncs}
+? 
+! Undefined control sequence.
+l.8 \usepackage
+               {makeidx}  % allows for indexgeneration
+? 
+! Undefined control sequence.
+l.10 \begin
+           {document}
+? 
+! Undefined control sequence.
+l.12 \frontmatter
+                           % for the preliminaries
+? 
+! Undefined control sequence.
+l.14 \pagestyle
+               {headings}  % switches on printing of running heads
+? 
+! Undefined control sequence.
+l.15 \addtocmark
+                {Hamiltonian Mechanics} % additional mark in the TOC
+? 
+! Undefined control sequence.
+l.17 \chapter
+             *{Preface}
+? 
+! Undefined control sequence.
+l.41 \vspace
+            {1cm}
+? 
+! Undefined control sequence.
+l.42 \begin
+           {flushright}\noindent
+? 
+Runaway argument?
+ Program Chair\\ ECOOP'95 \end {flushright} \chapter *{Organization} \ETC.
+! Paragraph ended before \\ was complete.
+<to be read again> 
+                   \par 
+l.194 
+      
+? 
+! Undefined control sequence.
+l.195 \maketitle
+                              % typeset the title of the contribution
+? 
+! Undefined control sequence.
+l.197 \begin
+            {abstract}
+? 
+! Undefined control sequence.
+l.202 \keywords
+               {computational geometry, graph theory, Hamilton cycles}
+? 
+[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] )</usr/share/texlive/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmti10.pfb>
+Output written on llncs.pdf (1 page, 40670 bytes).
+PDF statistics:
+ 20 PDF objects out of 1000 (max. 8388607)
+ 13 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+
