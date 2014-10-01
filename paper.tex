@@ -6,415 +6,162 @@
 % See http://www.springer.com/computer/lncs/lncs+authors?SGWID=0-40209-0-0-0
 % for the full guidelines.
 %
-\documentclass{llncs/llncs}
-
+\documentclass{llncs}
+\usepackage[T1]{fontenc}	
+\usepackage[utf8]{inputenc}		
+\usepackage{graphicx}	
 \begin{document}
 
-\title{Frequency Balance}
+\title{CBFB: A New Mode of Operation for Byte-Oriented Stream Ciphers}
 %
-\titlerunning{Hamiltonian Mechanics}  % abbreviated title (for running head)
+\titlerunning{CBFB}  % abbreviated title (for running head)
 %                                     also used for the TOC unless
 %                                     \toctitle is used
 %
-\author{Ivar Ekeland\inst{1} \and Roger Temam\inst{2}
-Jeffrey Dean \and David Grove \and Craig Chambers \and Kim~B.~Bruce \and
-Elsa Bertino}
+\author{Luiz Augusto Fontes Laranjeira\inst{1} \and Gabriela Matias Navarro\inst{2} }
 %
 \authorrunning{Ivar Ekeland et al.} % abbreviated author list (for running head)
 %
 %%%% list of authors for the TOC (use if author list has to be modified)
-\tocauthor{Ivar Ekeland, Roger Temam, Jeffrey Dean, David Grove,
-Craig Chambers, Kim B. Bruce, and Elisa Bertino}
+\tocauthor{Luiz Augusto Fontes Laranjeira and Gabriela Matias Navarro }
 %
-\institute{Princeton University, Princeton NJ 08544, USA,\\
-\email{I.Ekeland@princeton.edu},\\ WWW home page:
-\texttt{http://users/\homedir iekeland/web/welcome.html}
+\institute{University of Brasilia, Brasilia DF 70910-900, BR,\\
+\email{luiz.laranjeira@gmail.com}
 \and
-Universit\'{e} de Paris-Sud,
-Laboratoire d'Analyse Num\'{e}rique, B\^{a}timent 425,\\
-F-91405 Orsay Cedex, France}
+University of Brasilia, Brasilia DF 70910-900, BR, \\
+\email{navarro1703@gmail.com}}%
 
 \maketitle              % typeset the title of the contribution
 
 \begin{abstract}
-The abstract should summarize the contents of the paper
-using at least 70 and at most 150 words. It will be set in 9-point
-font size and be inset 1.0 cm from the right and left margins.
-There will be two blank lines before and after the Abstract. \dots
-\keywords{computational geometry, graph theory, Hamilton cycles}
+This paper introduces a new mode of operation for byte-oriented stream ciphers. This mode of operation, which we call CCFB (Ciphertext Byte Frequency Balancing mode), consists of an algorithm that balances out the byte frequency of the ciphertext produced by the stream cipher. The main benefit of its utilization is to make cryptanalysis by means of statistical byte frequency examination of the cipher text more difficult for potential attackers, producing therefore, more secure communications.  
+\keywords{stream cipher, cryptography, byte frequency, balance}
 \end{abstract}
 %
-\section{Fixed-Period Problems: The Sublinear Case}
+\section{Introduction}
 %
-With this chapter, the preliminaries are over, and we begin the search
-for periodic solutions to Hamiltonian systems. All this will be done in
-the convex case; that is, we shall study the boundary-value problem
-\begin{eqnarray*}
-  \dot{x}&=&JH' (t,x)\\
-  x(0) &=& x(T)
-\end{eqnarray*}
-with $H(t,\cdot)$ a convex function of $x$, going to $+\infty$ when
-$\left\|x\right\| \to \infty$.
+The main purpose of the use of cryptography is to keep information confidential, that is, to protect information from non-authorized access by transforming the plaintext into ciphertext and then allowing authorized users to recover the plaintext from the ciphertext, all of this by means of cryptosystems composed of ciphering/deciphering algorithms and one or more keys. There is continuous advancement in the world of cryptography and new algorithms are constantly emerging. Evolution in this field of knowledge is followed closely by the progress of cryptanalysis, which refers to the study of cryptosystems with a view of finding weaknesses in them that might facilitate the retrieval of the plaintext from the ciphertext, without necessarily knowing the key(s) or the algorithm.
+%
+One of the most well-known methods used in cryptanalysis is the statistical analysis of the byte frequency of a ciphered message. Although this approach was primarily used with classical ciphers, such as the Caesar and Vigenère ciphers, to exploit the character frequency that is inherent to a given written language, it can still be extended and applied to modern block ciphers such as DES and AES[ ], as well as to modern stream ciphers such as SNOW and RC4 [ ].
 
 %
-\subsection{Autonomous Systems}
+\section{Background}
 %
-In this section, we will consider the case when the Hamiltonian $H(x)$
-is autonomous. For the sake of simplicity, we shall also assume that it
-is $C^{1}$.
-
-We shall first consider the question of nontriviality, within the
-general framework of
-$\left(A_{\infty},B_{\infty}\right)$-subquadratic Hamiltonians. In
-the second subsection, we shall look into the special case when $H$ is
-$\left(0,b_{\infty}\right)$-subquadratic,
-and we shall try to derive additional information.
+There are two main types of cryptosystems: symmetric key cryptosystems and asymmetric key cryptosystems. An asymmetric key cryptosystem uses a pair of keys, correlated to one another in some mathematical way, such that one of the keys is used to encrypt the plaintext, while the other is used to decrypt the produced ciphertext. A symmetric key cryptosystem uses the same key to encrypt the plaintext and to decrypt the corresponding ciphertext. Symmetric key cryptosystems may use block ciphering/deciphering algorithms or stream ciphering/deciphering algorithms. 
 %
-\subsubsection{The General Case: Nontriviality.}
+Block ciphers encrypt/decrypt an entire block of characters/bytes in a single operation, where the size of each block is predefined. The plaintext is processed block by block in the encryption procedure, as well as in the decryption procedure. Well-known block ciphers are the Data Encryption Standard (DES), developed by IBM, and the Advanced Encryption Standard (AES), developed by two Belgian cryptographers, Joan Daemen and Vincent Rijmen.
 %
-We assume that $H$ is
-$\left(A_{\infty},B_{\infty}\right)$-sub\-qua\-dra\-tic at infinity,
-for some constant symmetric matrices $A_{\infty}$ and $B_{\infty}$,
-with $B_{\infty}-A_{\infty}$ positive definite. Set:
-\begin{eqnarray}
-\gamma :&=&{\rm smallest\ eigenvalue\ of}\ \ B_{\infty} - A_{\infty} \\
-  \lambda : &=& {\rm largest\ negative\ eigenvalue\ of}\ \
-  J \frac{d}{dt} +A_{\infty}\ .
-\end{eqnarray}
-
-Theorem~\ref{ghou:pre} tells us that if $\lambda +\gamma < 0$, the
-boundary-value problem:
-\begin{equation}
-\begin{array}{rcl}
-  \dot{x}&=&JH' (x)\\
-  x(0)&=&x (T)
-\end{array}
-\end{equation}
-has at least one solution
-$\overline{x}$, which is found by minimizing the dual
-action functional:
-\begin{equation}
-  \psi (u) = \int_{o}^{T} \left[\frac{1}{2}
-  \left(\Lambda_{o}^{-1} u,u\right) + N^{\ast} (-u)\right] dt
-\end{equation}
-on the range of $\Lambda$, which is a subspace $R (\Lambda)_{L}^{2}$
-with finite codimension. Here
-\begin{equation}
-  N(x) := H(x) - \frac{1}{2} \left(A_{\infty} x,x\right)
-\end{equation}
-is a convex function, and
-\begin{equation}
-  N(x) \le \frac{1}{2}
-  \left(\left(B_{\infty} - A_{\infty}\right) x,x\right)
-  + c\ \ \ \forall x\ .
-\end{equation}
-
+Stream ciphers can be bit-oriented, byte-oriented or word-oriented, depending on whether they encrypt/decrypt the plaintext/ciphertext one bit, one byte or one word at a time.
+\subsection{Stream Ciphers}
 %
-\begin{proposition}
-Assume $H'(0)=0$ and $ H(0)=0$. Set:
-\begin{equation}
-  \delta := \liminf_{x\to 0} 2 N (x) \left\|x\right\|^{-2}\ .
-  \label{eq:one}
-\end{equation}
+The stream cipher is the cipher that we used to develop this algorithm. The stream cipher encrypts the text using bit per bit or byte per byte.  It is widely used for network system such as bluetooth and SSL, the reason it is so used is because is faster than the block cipher.
 
-If $\gamma < - \lambda < \delta$,
-the solution $\overline{u}$ is non-zero:
-\begin{equation}
-  \overline{x} (t) \ne 0\ \ \ \forall t\ .
-\end{equation}
-\end{proposition}
+The other advantage is the possibility to transform a block cipher in stream cipher and for that it is needed to set the block size for bit or byte. Nowadays, there are four algorithms that covers 80\% of the world telecommunication and cyber space, they are: A5/1, A5/2, E0 and RC4.(citation BAKHTIARI)
+
+The overall behavior of a stream cipher follows the figure bellow (COLOCAR FIGURA). It encompasses the generation of a random byte keystream (which is generated from a key) and an encryption/decryption function. At the sender side the encryption function, usually an exclusive-or operation, takes as inputs the sequence of bytes of a plaintext and the generated keystream and produces the corresponding ciphered byte sequence. At the receiver side the same keystream must be again generated and the exclusive-or operation once more applied to the ciphertext sequence to recover the plaintext.
+
+This paper presents an application of the byte frequency balancing algorithm that we propose to the RC4 stream cipher. We choose this algorithm because is considered to be the fastest cipher algorithm available. We will explain how this the RC4 works.
 %
-\begin{proof}
-Condition (\ref{eq:one}) means that, for every
-$\delta ' > \delta$, there is some $\varepsilon > 0$ such that
-\begin{equation}
-  \left\|x\right\| \le \varepsilon \Rightarrow N (x) \le
-  \frac{\delta '}{2} \left\|x\right\|^{2}\ .
-\end{equation}
+\subsubsection{RC4}
+It was projected by Ron Rivest in 1987 and is widely used, because of its simplicity and high performance, in network systems such as SSL, TLS, WEP, and WPA, as well as in applications like Microsoft Windows, Lotus Notes, Apple AOCE, Oracle and Secure SQL, among others. RC4 employs a variable key size and its operation is based on random permutations of a set of byte values.
 
-It is an exercise in convex analysis, into which we shall not go, to
-show that this implies that there is an $\eta > 0$ such that
-\begin{equation}
-  f\left\|x\right\| \le \eta
-  \Rightarrow N^{\ast} (y) \le \frac{1}{2\delta '}
-  \left\|y\right\|^{2}\ .
-  \label{eq:two}
-\end{equation}
+It needs a pseudorandom number generator and the permutations are made on those numbers. It reads the plain text byte per byte and encrypts it with the exclusive-or operation. Bellow we can see a pseudo code for this algorithm.
 
-\begin{figure}
-\vspace{2.5cm}
-\caption{This is the caption of the figure displaying a white eagle and
-a white horse on a snow field}
-\end{figure}
+\subsection{Pseudorandom number generator}
+The generation of random numbers has been the object of attention of mathematician for many years. The main problem for a long time was to produce a deterministic algorithm with a sufficiently long periodicity as to simulate an apparently-random sequence of values to be used by complex applications.
 
-Since $u_{1}$ is a smooth function, we will have
-$\left\|hu_{1}\right\|_\infty \le \eta$
-for $h$ small enough, and inequality (\ref{eq:two}) will hold,
-yielding thereby:
-\begin{equation}
-  \psi (hu_{1}) \le \frac{h^{2}}{2}
-  \frac{1}{\lambda} \left\|u_{1} \right\|_{2}^{2} + \frac{h^{2}}{2}
-  \frac{1}{\delta '} \left\|u_{1}\right\|^{2}\ .
-\end{equation}
+Although the so-called True Random Number Generators (TRNGs)  exist and produce a sequence of numbers that are really random, in the case of applications such as cryptography one needs to be able to produce the same sequence of random numbers when performing both encryption as well as decryption. As a consequence, this sequence of numbers must be generated in a deterministic manner by the so-called PseudoRandom Number Generators (PRNGs).
 
-If we choose $\delta '$ close enough to $\delta$, the quantity
-$\left(\frac{1}{\lambda} + \frac{1}{\delta '}\right)$
-will be negative, and we end up with
-\begin{equation}
-  \psi (hu_{1}) < 0\ \ \ \ \ {\rm for}\ \ h\ne 0\ \ {\rm small}\ .
-\end{equation}
+Many PRNG algorithms have been designed and are widely used in cryptography, in particular in the implementation of stream ciphers. To be considered a pseudorandom number generator, the produced sequence must follow two criteria: 
 
-On the other hand, we check directly that $\psi (0) = 0$. This shows
-that 0 cannot be a minimizer of $\psi$, not even a local one.
-So $\overline{u} \ne 0$ and
-$\overline{u} \ne \Lambda_{o}^{-1} (0) = 0$. \qed
-\end{proof}
-%
-\begin{corollary}
-Assume $H$ is $C^{2}$ and
-$\left(a_{\infty},b_{\infty}\right)$-subquadratic at infinity. Let
-$\xi_{1},\allowbreak\dots,\allowbreak\xi_{N}$  be the
-equilibria, that is, the solutions of $H' (\xi ) = 0$.
-Denote by $\omega_{k}$
-the smallest eigenvalue of $H'' \left(\xi_{k}\right)$, and set:
-\begin{equation}
-  \omega : = {\rm Min\,} \left\{\omega_{1},\dots,\omega_{k}\right\}\ .
-\end{equation}
-If:
-\begin{equation}
-  \frac{T}{2\pi} b_{\infty} <
-  - E \left[- \frac{T}{2\pi}a_{\infty}\right] <
-  \frac{T}{2\pi}\omega
-  \label{eq:three}
-\end{equation}
-then minimization of $\psi$ yields a non-constant $T$-periodic solution
-$\overline{x}$.
-\end{corollary}
-%
+Randomness: the main requirement to make sure the sequence is random is to be sure that the numbers are random. It also have two criteria to validate this:
+	Uniform distribution: the frequency of bits in the sequence must approximately be the same, therefore, the amount of 0 must be approximate to the amount of 1.
+	Independence: the numbers don't have relation between them.
 
-We recall once more that by the integer part $E [\alpha ]$ of
-$\alpha \in \bbbr$, we mean the $a\in \bbbz$
-such that $a< \alpha \le a+1$. For instance,
-if we take $a_{\infty} = 0$, Corollary 2 tells
-us that $\overline{x}$ exists and is
-non-constant provided that:
+Unpredictability: This assure that if you know any number from the sequence, you can't predict the previous or the later number. 
+
+We will use the RC4 for byte random generation.
+
+\subsubsection{RC4}
+
+Although the RC4 is most know as a cipher algorithm, it is also a strong pseudo random generator. It is based on permutation of the 255 available bytes. There are two steps that needs to be done to make this algorithm work. 
+
+\subsubsection{Key Inicialization}
+This algorithm accepts any size of key. The first thing is done is inicialization of the vector S. This vector has size of 255 and to initialize each position of this vector is set equal to the corresponding character. For example: S[0] = 0, S[1] = 1 .... S[255] = 255. At the same time, another vector is created. This is a temporary vector, so we will call it T. If the key has size 256 bytes, we make T equal to K. But if the key is less than 256 bytes, the key is repeated until it completes the 256 position of the T vector.
+
+This temporary vector is used to make the first permutation of the S vector. For this, we will use two control variables: i and j, and i goes from 0 to 255. At this point we will only swap the value contained in S[i] to S[j]. And the value contained in S[j] to S[i].
+
+The following rule is used to make this permutation is:
 
 \begin{equation}
-  \frac{T}{2\pi} b_{\infty} < 1 < \frac{T}{2\pi}
-\end{equation}
-or
-\begin{equation}
-  T\in \left(\frac{2\pi}{\omega},\frac{2\pi}{b_{\infty}}\right)\ .
-  \label{eq:four}
+  j := (j + S[i] + T[i]) mod 256
 \end{equation}
 
-%
-\begin{proof}
-The spectrum of $\Lambda$ is $\frac{2\pi}{T} \bbbz +a_{\infty}$. The
-largest negative eigenvalue $\lambda$ is given by
-$\frac{2\pi}{T}k_{o} +a_{\infty}$,
-where
+\includegraphics{./figuras/funcionamento}
+
+\subsubsection{Char generation}
+
+After the key inicialization and S is initialized, it's time to generate characters to use in the cipher process. This process still uses the control variable i and j and the both starts with 0. This generation is made by using the following equation:
+
 \begin{equation}
-  \frac{2\pi}{T}k_{o} + a_{\infty} < 0
-  \le \frac{2\pi}{T} (k_{o} +1) + a_{\infty}\ .
-\end{equation}
-Hence:
-\begin{equation}
-  k_{o} = E \left[- \frac{T}{2\pi} a_{\infty}\right] \ .
+ i := (i + 1) mod 256
 \end{equation}
 
-The condition $\gamma < -\lambda < \delta$ now becomes:
 \begin{equation}
-  b_{\infty} - a_{\infty} <
-  - \frac{2\pi}{T} k_{o} -a_{\infty} < \omega -a_{\infty}
-\end{equation}
-which is precisely condition (\ref{eq:three}).\qed
-\end{proof}
-%
-
-\begin{lemma}
-Assume that $H$ is $C^{2}$ on $\bbbr^{2n} \setminus \{ 0\}$ and
-that $H'' (x)$ is non-de\-gen\-er\-ate for any $x\ne 0$. Then any local
-minimizer $\widetilde{x}$ of $\psi$ has minimal period $T$.
-\end{lemma}
-%
-\begin{proof}
-We know that $\widetilde{x}$, or
-$\widetilde{x} + \xi$ for some constant $\xi
-\in \bbbr^{2n}$, is a $T$-periodic solution of the Hamiltonian system:
-\begin{equation}
-  \dot{x} = JH' (x)\ .
+ j := (j + S[i]) mod 256
 \end{equation}
 
-There is no loss of generality in taking $\xi = 0$. So
-$\psi (x) \ge \psi (\widetilde{x} )$
-for all $\widetilde{x}$ in some neighbourhood of $x$ in
-$W^{1,2} \left(\bbbr / T\bbbz ; \bbbr^{2n}\right)$.
+After this two variables are obtained a swap operation is done with the values of S[i] and S[j]. And the following operation is done:
 
-But this index is precisely the index
-$i_{T} (\widetilde{x} )$ of the $T$-periodic
-solution $\widetilde{x}$ over the interval
-$(0,T)$, as defined in Sect.~2.6. So
 \begin{equation}
-  i_{T} (\widetilde{x} ) = 0\ .
-  \label{eq:five}
+ t := (S[i] + S[j]) mod 256
 \end{equation}
 
-Now if $\widetilde{x}$ has a lower period, $T/k$ say,
-we would have, by Corollary 31:
-\begin{equation}
-  i_{T} (\widetilde{x} ) =
-  i_{kT/k}(\widetilde{x} ) \ge
-  ki_{T/k} (\widetilde{x} ) + k-1 \ge k-1 \ge 1\ .
-\end{equation}
+The character generated is equal to S[k].
 
-This would contradict (\ref{eq:five}), and thus cannot happen.\qed
-\end{proof}
-%
-\paragraph{Notes and Comments.}
-The results in this section are a
-refined version of \cite{clar:eke};
-the minimality result of Proposition
-14 was the first of its kind.
+\section{The algorithm}
 
-To understand the nontriviality conditions, such as the one in formula
-(\ref{eq:four}), one may think of a one-parameter family
-$x_{T}$, $T\in \left(2\pi\omega^{-1}, 2\pi b_{\infty}^{-1}\right)$
-of periodic solutions, $x_{T} (0) = x_{T} (T)$,
-with $x_{T}$ going away to infinity when $T\to 2\pi \omega^{-1}$,
-which is the period of the linearized system at 0.
+This section will present the algorithm that we aim to propose, details of its functioning and advantages.
 
-\begin{table}
-\caption{This is the example table taken out of {\it The
-\TeX{}book,} p.\,246}
-\begin{center}
-\begin{tabular}{r@{\quad}rl}
-\hline
-\multicolumn{1}{l}{\rule{0pt}{12pt}
-                   Year}&\multicolumn{2}{l}{World population}\\[2pt]
-\hline\rule{0pt}{12pt}
-8000 B.C.  &     5,000,000& \\
-  50 A.D.  &   200,000,000& \\
-1650 A.D.  &   500,000,000& \\
-1945 A.D.  & 2,300,000,000& \\
-1980 A.D.  & 4,400,000,000& \\[2pt]
-\hline
-\end{tabular}
-\end{center}
-\end{table}
-%
-\begin{theorem} [Ghoussoub-Preiss]\label{ghou:pre}
-Assume $H(t,x)$ is
-$(0,\varepsilon )$-subquadratic at
-infinity for all $\varepsilon > 0$, and $T$-periodic in $t$
-\begin{equation}
-  H (t,\cdot )\ \ \ \ \ {\rm is\ convex}\ \ \forall t
-\end{equation}
-\begin{equation}
-  H (\cdot ,x)\ \ \ \ \ {\rm is}\ \ T{\rm -periodic}\ \ \forall x
-\end{equation}
-\begin{equation}
-  H (t,x)\ge n\left(\left\|x\right\|\right)\ \ \ \ \
-  {\rm with}\ \ n (s)s^{-1}\to \infty\ \ {\rm as}\ \ s\to \infty
-\end{equation}
-\begin{equation}
-  \forall \varepsilon > 0\ ,\ \ \ \exists c\ :\
-  H(t,x) \le \frac{\varepsilon}{2}\left\|x\right\|^{2} + c\ .
-\end{equation}
+\subsection{Motivation}
 
-Assume also that $H$ is $C^{2}$, and $H'' (t,x)$ is positive definite
-everywhere. Then there is a sequence $x_{k}$, $k\in \bbbn$, of
-$kT$-periodic solutions of the system
-\begin{equation}
-  \dot{x} = JH' (t,x)
-\end{equation}
-such that, for every $k\in \bbbn$, there is some $p_{o}\in\bbbn$ with:
-\begin{equation}
-  p\ge p_{o}\Rightarrow x_{pk} \ne x_{k}\ .
-\end{equation}
-\qed
-\end{theorem}
-%
-\begin{example} [{{\rm External forcing}}]
-Consider the system:
-\begin{equation}
-  \dot{x} = JH' (x) + f(t)
-\end{equation}
-where the Hamiltonian $H$ is
-$\left(0,b_{\infty}\right)$-subquadratic, and the
-forcing term is a distribution on the circle:
-\begin{equation}
-  f = \frac{d}{dt} F + f_{o}\ \ \ \ \
-  {\rm with}\ \ F\in L^{2} \left(\bbbr / T\bbbz; \bbbr^{2n}\right)\ ,
-\end{equation}
-where $f_{o} : = T^{-1}\int_{o}^{T} f (t) dt$. For instance,
-\begin{equation}
-  f (t) = \sum_{k\in \bbbn} \delta_{k} \xi\ ,
-\end{equation}
-where $\delta_{k}$ is the Dirac mass at $t= k$ and
-$\xi \in \bbbr^{2n}$ is a
-constant, fits the prescription. This means that the system
-$\dot{x} = JH' (x)$ is being excited by a
-series of identical shocks at interval $T$.
-\end{example}
-%
-\begin{definition}
-Let $A_{\infty} (t)$ and $B_{\infty} (t)$ be symmetric
-operators in $\bbbr^{2n}$, depending continuously on
-$t\in [0,T]$, such that
-$A_{\infty} (t) \le B_{\infty} (t)$ for all $t$.
+The evolution in cryptography is constant and there are always new algorithms that focus in create a solution of a new obstacles that are imposed by possible attackers and their methods to obtain secret informations. 
 
-A Borelian function
-$H: [0,T]\times \bbbr^{2n} \to \bbbr$
-is called
-$\left(A_{\infty} ,B_{\infty}\right)$-{\it subquadratic at infinity}
-if there exists a function $N(t,x)$ such that:
-\begin{equation}
-  H (t,x) = \frac{1}{2} \left(A_{\infty} (t) x,x\right) + N(t,x)
-\end{equation}
-\begin{equation}
-  \forall t\ ,\ \ \ N(t,x)\ \ \ \ \
-  {\rm is\ convex\ with\  respect\  to}\ \ x
-\end{equation}
-\begin{equation}
-  N(t,x) \ge n\left(\left\|x\right\|\right)\ \ \ \ \
-  {\rm with}\ \ n(s)s^{-1}\to +\infty\ \ {\rm as}\ \ s\to +\infty
-\end{equation}
-\begin{equation}
-  \exists c\in \bbbr\ :\ \ \ H (t,x) \le
-  \frac{1}{2} \left(B_{\infty} (t) x,x\right) + c\ \ \ \forall x\ .
-\end{equation}
+This algorithm want to create a solution for a well known problem with cryptography. It wants to  reduce  the possibilities to obtain a secret information by using frequency analysis.
 
-If $A_{\infty} (t) = a_{\infty} I$ and
-$B_{\infty} (t) = b_{\infty} I$, with
-$a_{\infty} \le b_{\infty} \in \bbbr$,
-we shall say that $H$ is
-$\left(a_{\infty},b_{\infty}\right)$-subquadratic
-at infinity. As an example, the function
-$\left\|x\right\|^{\alpha}$, with
-$1\le \alpha < 2$, is $(0,\varepsilon )$-subquadratic at infinity
-for every $\varepsilon > 0$. Similarly, the Hamiltonian
-\begin{equation}
-H (t,x) = \frac{1}{2} k \left\|k\right\|^{2} +\left\|x\right\|^{\alpha}
-\end{equation}
-is $(k,k+\varepsilon )$-subquadratic for every $\varepsilon > 0$.
-Note that, if $k<0$, it is not convex.
-\end{definition}
-%
+\subsection{Functioning}
 
-\paragraph{Notes and Comments.}
-The first results on subharmonics were
-obtained by Rabinowitz in \cite{rab}, who showed the existence of
-infinitely many subharmonics both in the subquadratic and superquadratic
-case, with suitable growth conditions on $H'$. Again the duality
-approach enabled Clarke and Ekeland in \cite{clar:eke:2} to treat the
-same problem in the convex-subquadratic case, with growth conditions on
-$H$ only.
+The cipher algorithm will receive a plain text and a sequence of pseudorandom numbers will produce a cipher text where all the bytes frequency occurrence will be balanced.
 
-Recently, Michalek and Tarantello (see \cite{mich:tar} and \cite{tar})
-have obtained lower bound on the number of subharmonics of period $kT$,
-based on symmetry considerations and on pinching estimates, as in
-Sect.~5.2 of this article.
+The mechanism that will be used to produce this balancing is in form of rounds of 256 bytes that each byte will appear only once in each round.  That means that the 256 cipher bytes of each round are distinct, but the order that it appear is pseudorandom.
+
+A table of 256 bytes will be used to make the balancing of the cipher text. In the beginning of the round of all 256 positions are set to not occupied. For each byte of the plain text will cipher will be transform by a exclusive-or operation with the corresponding value supplied from the pseudorandom number generator resulting in a preciphered byte. With this preciphered byte the algorithm will check if the value is occupied on the table.After the balancing table is completed, the table is reset and the process starts over.
+
+In case this preciphered byte is equal to a position already occupied on the table, this value will be rejected and the next value of the pseudorandom sequence will be use to make a new cipher text for that plain text byte. This procedure will be repeated until a non occupied position at the table is achieved. The amount of unused pseudorandom numbers will be recorded in a variable called j. This variable will be set to 0 again when the preciphered byte is equal to a non occupied value on the table.
+
+A control variable called signal is used so that the decipher can know that a conflict existed at some point. In this way, the decipher can know that the following byte is another control variable and will represent the amount of characters that needs to be discarded ( the j variable ). The signal variable is not ciphered, because in this way, all the 256 bytes can be used to cipher.
+
+On the decipher algorithm the balancing table is not needed and therefore not used. On every round, the first value of the pseudorandom generator character is set to be the signal of the round. Because of this, a control variable needs to be used to know when is need to get a new signal.
+
+
+\section{Results}
+
+To make a more realistic approach, it was used a network connection (TCP) with the code of the algorithm here proposed. 
+
+The scheme that was used can be seen on the bellow image. A message queue was used so that the cipher routine could put the ciphertext byte on the message queue.
+
+MAKE A IMAGE SHOWING THE ARCHITECTURE
+
+Another feature that was also used is a  thread, that was responsible to send the values from the queue to the decipher algorithm. 
+
+The table bellow shows some results of experiments that was performed with the code produced following the above architecture.
+
+PUT TABLE
+
+
+\section{Conclusion}
+
+
 
 %
 % ---- Bibliography ----
