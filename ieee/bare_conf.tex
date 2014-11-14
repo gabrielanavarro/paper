@@ -601,7 +601,7 @@ Two POSIX threads and a message queue were utilized in this implementation. In t
 
 \subsection{Discussion of experimental results}
 
-The ciphering/deciphering experiments were conducted using plaintext files varying from 10 thousands to 1 million characters. 
+The ciphering/deciphering experiments were conducted using plaintext files varying from 10 thousand to 1 million characters. 
 
 \begin{table}[!t]
 \centering
@@ -633,7 +633,7 @@ Text size(chars) & RC4(ms) & RC4 + CBFB(ms) & Time overhead(ms) \\ \hline
 \label{ciphering-time-comparison}
 \end{table}
 
-Table \ref{conflict-amount} and \ref{ciphering-time-comparison} compares the ciphering times taken by the CBFB “enveloped” RC4 algorithm with the ciphering times required by the plain RC4 algorithm for the chosen plaintext files. It also shows the number of conflicts the CBFB algorithm had to handle, as well as the average conflict resolution times, when balancing out the ciphertext byte frequency in the ciphering procedure of the various files. It can be observed that the number of conflicts was roughly equal to half the size of the plaintext being encoded. Conversely, the average conflict resolution time for plaintext files of size 10,000 characters or more did not vary significantly.
+Table \ref{conflict-amount} and \ref{ciphering-time-comparison} compare the ciphering times taken by the CBFB “enveloped” RC4 algorithm with the ciphering times required by the plain RC4 algorithm for the chosen plaintext files. It also shows the number of conflicts the CBFB algorithm had to handle, as well as the average conflict resolution times, when balancing out the ciphertext byte frequency in the ciphering procedure of the various files. It can be observed that the number of conflicts was roughly equal to half the size of the plaintext being encoded. Conversely, the average conflict resolution time for plaintext files of size 10,000 characters or more did not vary significantly.
 
 \begin{table}[!t]
 \centering
@@ -651,7 +651,7 @@ Table \ref{conflict-amount} and \ref{ciphering-time-comparison} compares the cip
 \label{end-to-end}
 \end{table}
 
-Table \ref{end-to-end} displays the end-to-end times for ciphering and deciphering the various plaintext files using the CBFB “enveloped” RC4 and the plain RC4 algorithm. It can be noticed that the time overhead for the end-to-end encoding/decoding procedure when the CBFB mode of operation is employed between remote communication entities, as compared to the plain RC4 stream cipher, is at most 6.09\% for the architecture and assumptions used in the experiment. The reason for the small variation in the end-to-end times observed in this experiment is that the communication times outweigh the ciphering/deciphering times and, therefore, the processing overhead incurred by CBFB mode of operation is lessened by the communication overhead and the concurrency between processing and communication functionalities afforded by the multithreaded implementation.
+Table \ref{end-to-end} displays the end-to-end times for ciphering, communicating and deciphering the various plaintext files using the CBFB “enveloped” RC4 and the plain RC4 algorithm. It can be noticed that the time overhead for the end-to-end encoding/decoding procedure when the CBFB mode of operation is employed between remote communicating entities, as compared to the plain RC4 stream cipher, is at most 6.09\% for the architecture and assumptions used in the experiment. The reason for the small variation in the end-to-end times observed in this experiment is that the communication times outweigh the ciphering/deciphering times and, therefore, the processing overhead incurred by CBFB mode of operation is lessened by the communication overhead and the concurrency between processing and communication functionalities afforded by the multithreaded implementation.
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
